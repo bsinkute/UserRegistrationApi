@@ -12,6 +12,8 @@ namespace UserRegistrationApi.Infrastructure.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new PersonalInformationConfiguration());
+            modelBuilder.ApplyConfiguration(new AddressConfiguration());
         }
     }
 }

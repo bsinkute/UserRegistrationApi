@@ -2,7 +2,7 @@
 {
     public class PersonalInformation
     {
-        public required Guid PersonalinformationId { get; set; }
+        public required Guid PersonalInformationId { get; set; }
         public required string FirstName { get; set; }
         public required string Surname { get; set; }
         public required string PersonalIdentificationNumber { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserRegistrationApi.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using UserRegistrationApi.Infrastructure.Database;
 namespace UserRegistrationApi.Infrastructure.Migrations
 {
     [DbContext(typeof(UserRegistrationDbContext))]
-    partial class UserRegistrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240819183151_AddPersonalInformationTable")]
+    partial class AddPersonalInformationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,45 +25,9 @@ namespace UserRegistrationApi.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("UserRegistrationApi.Domain.Models.Address", b =>
-                {
-                    b.Property<Guid>("AddressId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ApartmentNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("HouseNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("AddressId");
-
-                    b.ToTable("Address", (string)null);
-                });
-
             modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
                 {
                     b.Property<Guid>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AdressId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
@@ -133,17 +100,6 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("UserRegistrationApi.Domain.Models.Address", b =>
-                {
-                    b.HasOne("UserRegistrationApi.Domain.Models.PersonalInformation", "PersonalInformation")
-                        .WithOne("Address")
-                        .HasForeignKey("UserRegistrationApi.Domain.Models.Address", "AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PersonalInformation");
-                });
-
             modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
                 {
                     b.HasOne("UserRegistrationApi.Domain.Models.User", "User")
@@ -153,12 +109,6 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
-                {
-                    b.Navigation("Address")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("UserRegistrationApi.Domain.Models.User", b =>
