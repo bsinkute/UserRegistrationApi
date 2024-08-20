@@ -1,10 +1,26 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using UserRegistrationApi.Domain.Models;
 
 namespace UserRegistrationApi.Services
 {
-    public class UserCredentialServise
+    public interface IUserCredentialService
     {
+        HashedCredentials GetHashedCredentials(string password);
+    }
+
+    public class UserCredentialService : IUserCredentialService
+    {
+        public HashedCredentials GetHashedCredentials(string password)
+        {
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+            return new HashedCredentials
+            {
+                Password = passwordHash,
+                Salt = passwordSalt
+            };
+        }
+
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] salt)
         {
             using var hmac = new HMACSHA512(salt);
