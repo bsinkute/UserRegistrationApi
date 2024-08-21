@@ -8,10 +8,12 @@ namespace UserRegistrationApi.Controllers
     {
 
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IJwtService jwtService)
         {
             _userService = userService;
+            _jwtService = jwtService;
         }
 
         [HttpPost("Register")]
@@ -25,12 +27,14 @@ namespace UserRegistrationApi.Controllers
         [HttpGet("Login")]
         public async Task<ActionResult> Login(string username, string password)
         {
+            var user = await _userService.LoginAsync(username, password);
+            if (user == null) 
+            { 
+                return Unauthorized();
+            }
 
-            /*if (_userService.Login(username, password, out string role))
-            {
-                return Ok(_jwtService.GenerateToken(username, role));
-            }*/
-            return Unauthorized();
+            var token = _jwtService.GenerateToken(username, user.Role);
+            return Ok(token);
         }
     }
 }
