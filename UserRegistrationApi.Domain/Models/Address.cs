@@ -7,7 +7,7 @@
         public required string Street { get; set; }
         public required string HouseNumber { get; set; }
         public required string ApartmentNumber { get; set; }
-        public required Guid PersonalInformationId { get; set; }
-        public required PersonalInformation PersonalInformation { get; set; }
+        public Guid PersonalInformationId { get; set; }
+        public PersonalInformation PersonalInformation { get; set; }
     }
 }

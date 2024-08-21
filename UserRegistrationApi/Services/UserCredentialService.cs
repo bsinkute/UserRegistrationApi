@@ -7,6 +7,7 @@ namespace UserRegistrationApi.Services
     public interface IUserCredentialService
     {
         HashedCredentials GetHashedCredentials(string password);
+        bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] salt);
     }
 
     public class UserCredentialService : IUserCredentialService
@@ -21,7 +22,7 @@ namespace UserRegistrationApi.Services
             };
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] salt)
+        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] salt)
         {
             using var hmac = new HMACSHA512(salt);
             var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
