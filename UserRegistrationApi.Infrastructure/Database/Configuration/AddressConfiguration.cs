@@ -27,10 +27,6 @@ namespace UserRegistrationApi.Infrastructure.Database.Configuration
             builder.Property(x => x.ApartmentNumber)
                 .IsRequired()
                 .HasMaxLength(100);
-
-            builder.HasOne(x => x.PersonalInformation)
-                .WithOne(x => x.Address)
-                .HasForeignKey<Address>(x => x.AddressId);
         }
     }
 }

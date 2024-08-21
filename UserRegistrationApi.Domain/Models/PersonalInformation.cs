@@ -9,10 +9,9 @@
         public required string PhoneNumber { get; set; }
         public required string Email {  get; set; }
         public required byte[] ProfilePicture { get; set; }
-        public Guid AdressId { get; set; }
-        public Address Address { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; }
+        public Address Address { get; set; }
 
     }
 }

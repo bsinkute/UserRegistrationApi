@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UserRegistrationApi.Infrastructure.Extensions;
+using UserRegistrationApi.Services;
 
 namespace UserRegistrationApi
 {
@@ -17,6 +18,11 @@ namespace UserRegistrationApi
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddInfrastructureServices(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+            builder.Services.AddScoped<IUserCredentialService, UserCredentialService>();
+            builder.Services.AddScoped<IProfilePictureService, ProfilePictureService>();
+            builder.Services.AddScoped<ICreateUserMapper, CreateUserMapper>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             var app = builder.Build();
 

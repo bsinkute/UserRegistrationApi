@@ -6,8 +6,8 @@ namespace UserRegistrationApi.Services
 {
     public interface IUserService
     {
-        Task Register(CreateUserDto userDto);
-        Task<User?> Login(string username, string password);
+        Task RegisterAsync(CreateUserDto userDto);
+        Task<User?> LoginAsync(string username, string password);
     }
 
     public class UserService : IUserService
@@ -23,14 +23,14 @@ namespace UserRegistrationApi.Services
             _userCredentialService = userCredentialService;
         }
 
-        public async Task Register(CreateUserDto userDto)
+        public async Task RegisterAsync(CreateUserDto userDto)
         {
             var user = _createUserMapper.Bind(userDto);
-
+            
             await _userRepository.AddUserAsync(user);
         }
 
-        public async Task<User?> Login(string username, string password)
+        public async Task<User?> LoginAsync(string username, string password)
         {
             var user = await _userRepository.GetUserAsync(username);
 

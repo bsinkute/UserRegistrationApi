@@ -33,13 +33,9 @@ namespace UserRegistrationApi.Infrastructure.Database.Configuration
             builder.Property(x => x.ProfilePicture)
                 .IsRequired();
 
-            builder.HasOne(x => x.User)
-                .WithOne(x => x.PersonalInformation)
-                .HasForeignKey<PersonalInformation>(x => x.PersonalInformationId);
-
             builder.HasOne(x => x.Address)
                 .WithOne(x => x.PersonalInformation)
-                .HasForeignKey<PersonalInformation>(x => x.PersonalInformationId)
+                .HasForeignKey<Address>(x => x.PersonalInformationId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

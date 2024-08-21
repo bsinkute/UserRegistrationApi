@@ -8,6 +8,8 @@ namespace UserRegistrationApi.Infrastructure.Database
     {
         public UserRegistrationDbContext(DbContextOptions<UserRegistrationDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
+        public DbSet<PersonalInformation> PersonalInformation { get; set; }
+        public DbSet<Address> Address { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserRegistrationApi.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using UserRegistrationApi.Infrastructure.Database;
 namespace UserRegistrationApi.Infrastructure.Migrations
 {
     [DbContext(typeof(UserRegistrationDbContext))]
-    partial class UserRegistrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821170320_FixRelations")]
+    partial class FixRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,9 +54,6 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("AddressId");
-
-                    b.HasIndex("PersonalInformationId")
-                        .IsUnique();
 
                     b.ToTable("Address", (string)null);
                 });
@@ -133,31 +133,28 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("UserRegistrationApi.Domain.Models.Address", b =>
+            modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
                 {
-                    b.HasOne("UserRegistrationApi.Domain.Models.PersonalInformation", "PersonalInformation")
-                        .WithOne("Address")
-                        .HasForeignKey("UserRegistrationApi.Domain.Models.Address", "PersonalInformationId")
+                    b.HasOne("UserRegistrationApi.Domain.Models.Address", "Address")
+                        .WithOne("PersonalInformation")
+                        .HasForeignKey("UserRegistrationApi.Domain.Models.PersonalInformation", "PersonalInformationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PersonalInformation");
-                });
-
-            modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
-                {
                     b.HasOne("UserRegistrationApi.Domain.Models.User", "User")
                         .WithOne("PersonalInformation")
                         .HasForeignKey("UserRegistrationApi.Domain.Models.PersonalInformation", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Address");
+
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
+            modelBuilder.Entity("UserRegistrationApi.Domain.Models.Address", b =>
                 {
-                    b.Navigation("Address")
+                    b.Navigation("PersonalInformation")
                         .IsRequired();
                 });
 

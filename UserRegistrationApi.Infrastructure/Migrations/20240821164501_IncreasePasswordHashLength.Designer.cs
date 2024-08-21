@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserRegistrationApi.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using UserRegistrationApi.Infrastructure.Database;
 namespace UserRegistrationApi.Infrastructure.Migrations
 {
     [DbContext(typeof(UserRegistrationDbContext))]
-    partial class UserRegistrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821164501_IncreasePasswordHashLength")]
+    partial class IncreasePasswordHashLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,15 +55,15 @@ namespace UserRegistrationApi.Infrastructure.Migrations
 
                     b.HasKey("AddressId");
 
-                    b.HasIndex("PersonalInformationId")
-                        .IsUnique();
-
                     b.ToTable("Address", (string)null);
                 });
 
             modelBuilder.Entity("UserRegistrationApi.Domain.Models.PersonalInformation", b =>
                 {
                     b.Property<Guid>("PersonalInformationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdressId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
@@ -97,9 +100,6 @@ namespace UserRegistrationApi.Infrastructure.Migrations
 
                     b.HasKey("PersonalInformationId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
                     b.ToTable("PersonalInformation", (string)null);
                 });
 
@@ -113,6 +113,9 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("varbinary(500)");
 
+                    b.Property<Guid>("PersonalInformationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -120,8 +123,8 @@ namespace UserRegistrationApi.Infrastructure.Migrations
 
                     b.Property<byte[]>("Salt")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varbinary(500)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varbinary(100)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -137,7 +140,7 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                 {
                     b.HasOne("UserRegistrationApi.Domain.Models.PersonalInformation", "PersonalInformation")
                         .WithOne("Address")
-                        .HasForeignKey("UserRegistrationApi.Domain.Models.Address", "PersonalInformationId")
+                        .HasForeignKey("UserRegistrationApi.Domain.Models.Address", "AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -148,7 +151,7 @@ namespace UserRegistrationApi.Infrastructure.Migrations
                 {
                     b.HasOne("UserRegistrationApi.Domain.Models.User", "User")
                         .WithOne("PersonalInformation")
-                        .HasForeignKey("UserRegistrationApi.Domain.Models.PersonalInformation", "UserId")
+                        .HasForeignKey("UserRegistrationApi.Domain.Models.PersonalInformation", "PersonalInformationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

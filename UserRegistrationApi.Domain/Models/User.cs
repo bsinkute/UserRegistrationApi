@@ -7,9 +7,6 @@
         public required byte[] Password { get; set; }
         public required byte[] Salt { get; set; }
         public required string Role { get; set; }
-        public Guid PersonalInformationId { get; set; }
         public PersonalInformation PersonalInformation { get; set; }
-        
-
     }
 }

@@ -22,32 +22,40 @@ namespace UserRegistrationApi.Services
         {
             var hashedCredentials = _userCredentialService.GetHashedCredentials(dto.Password);
 
-            return new User
+            var userId = Guid.NewGuid();
+            var personalInformationId = Guid.NewGuid();
+            var addressId = Guid.NewGuid();
+
+            var user = new User
             {
-                UserId = Guid.NewGuid(),
+                UserId = userId,
                 Username = dto.Username,
                 Password = hashedCredentials.Password,
                 Salt = hashedCredentials.Salt,
                 Role = "User",
                 PersonalInformation = new PersonalInformation
                 {
-                    PersonalInformationId = Guid.NewGuid(),
+                    PersonalInformationId = personalInformationId,
                     FirstName = dto.FirstName,
                     Surname = dto.Surname,
                     PersonalIdentificationNumber = dto.PersonalIdentificationNumber,
                     PhoneNumber = dto.PhoneNumber,
                     Email = dto.Email,
                     ProfilePicture = _profilePictureService.GenerateProfilePicture(dto.Image),
+                    UserId = userId,
                     Address = new Address
                     {
-                        AddressId = Guid.NewGuid(),
+                        AddressId = addressId,
                         City = dto.City,
                         Street = dto.Street,
                         HouseNumber = dto.HouseNumber,
                         ApartmentNumber = dto.ApartmentNumber,
-                    }
-                }
+                        PersonalInformationId = personalInformationId,
+                    },
+                },
             };
+
+            return user;
         }
     }  
 }

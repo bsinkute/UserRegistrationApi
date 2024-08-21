@@ -17,13 +17,13 @@ namespace UserRegistrationApi.Infrastructure.Database.Configuration
                 .ValueGeneratedNever();
             builder.Property(u => u.Username)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(500);
             builder.Property(u => u.Password)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(500);
             builder.Property(u => u.Salt)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(500);
             builder.Property(u => u.Role)
                 .IsRequired()
                 .HasMaxLength(50);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using UserRegistrationApi.Infrastructure.Database;
+using UserRegistrationApi.Infrastructure.Repositories;
 
 namespace UserRegistrationApi.Infrastructure.Extensions
 {
@@ -13,6 +14,7 @@ namespace UserRegistrationApi.Infrastructure.Extensions
             {
                 options.UseSqlServer(connectionString);
             });
+            services.AddScoped<IUserRepository, UserReposotory>();
             return services;
         }
     }
