@@ -10,7 +10,7 @@ namespace UserRegistrationApi.Infrastructure.Repositories
         Task<User> GetUserAsync(string username);
         Task<User> GetUserByIdAsync(Guid userId);
         Task UpdateUserPersonalInformation(User user);
-        Task UpdateUseAddress(User user);
+        Task UpdateUserAddress(User user);
     }
     public class UserReposotory : IUserRepository
     {
@@ -49,7 +49,7 @@ namespace UserRegistrationApi.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUseAddress(User user)
+        public async Task UpdateUserAddress(User user)
         {
             _context.Address.Update(user.PersonalInformation.Address);
             await _context.SaveChangesAsync();

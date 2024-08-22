@@ -19,7 +19,7 @@ namespace UserRegistrationApi.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<ActionResult> Register(CreateUserDto userDto)
+        public async Task<ActionResult> Register([FromForm] CreateUserDto userDto)
         {
             await _userService.RegisterAsync(userDto);
 
