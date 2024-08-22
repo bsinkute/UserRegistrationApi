@@ -6,6 +6,7 @@ namespace UserRegistrationApi.Controllers
 
     [ApiController]
     [Route("api/users")]
+    [Authorize]
     public class PersonalInformationController : ControllerBase
     {
         public PersonalInformationController()

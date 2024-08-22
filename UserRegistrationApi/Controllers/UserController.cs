@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
 namespace UserRegistrationApi.Controllers
 {
+    [ApiController]
     public class UserController : ControllerBase
     {
 
