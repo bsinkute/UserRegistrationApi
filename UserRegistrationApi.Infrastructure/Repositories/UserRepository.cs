@@ -8,6 +8,9 @@ namespace UserRegistrationApi.Infrastructure.Repositories
     {
         Task AddUserAsync(User user);
         Task<User> GetUserAsync(string username);
+        Task<User> GetUserByIdAsync(Guid userId);
+        Task UpdateUserPersonalInformation(User user);
+        Task UpdateUseAddress(User user);
     }
     public class UserReposotory : IUserRepository
     {
@@ -28,6 +31,28 @@ namespace UserRegistrationApi.Infrastructure.Repositories
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             return user;
+        }
+
+        public async Task<User> GetUserByIdAsync(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(x => x.PersonalInformation)
+                .ThenInclude(x => x.Address)
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            return user;
+        }
+
+        public async Task UpdateUserPersonalInformation(User user)
+        {
+            _context.PersonalInformation.Update(user.PersonalInformation);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUseAddress(User user)
+        {
+            _context.Address.Update(user.PersonalInformation.Address);
+            await _context.SaveChangesAsync();
         }
     }
 }

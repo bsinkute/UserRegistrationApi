@@ -74,6 +74,7 @@ namespace UserRegistrationApi
             builder.Services.AddScoped<ICreateUserMapper, CreateUserMapper>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJwtService, JwtService>();
+            builder.Services.AddScoped<IPersonalInformationService, PersonalInformationService>();
 
             var app = builder.Build();
 
