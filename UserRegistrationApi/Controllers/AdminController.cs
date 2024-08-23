@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UserRegistrationApi.Domain.Models;
+using UserRegistrationApi.Models.Dto;
+using UserRegistrationApi.Services;
 
 namespace UserRegistrationApi.Controllers
 {
@@ -9,25 +12,40 @@ namespace UserRegistrationApi.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-
-        public AdminController()
+        private readonly IUserService _userService;
+        private readonly IPersonalInformationService _personalInformationService;
+        private readonly IUserDtoMapper _userDtoMapper;
+        public AdminController(IUserService userService, IPersonalInformationService personalInformationService, IUserDtoMapper userDtoMapper)
         {
+            _userService = userService;
+            _personalInformationService = personalInformationService;
+            _userDtoMapper = userDtoMapper;
         }
 
         [HttpGet("users")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetUsersAsync()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersAsync()
         {
-            return Ok();
+            var users = await _personalInformationService.GetUsersAsync();
+
+            if (users == null || !users.Any())
+            {
+                return NotFound("No users found.");
+            }
+
+            var userDtos = users.Select(_userDtoMapper.Bind);
+
+            return Ok(userDtos);
         }
 
-        [HttpDelete("users/{id:Guid}")]
+        [HttpDelete("{id:Guid}/users")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteUser([FromRoute] int id)
+        public async Task<ActionResult> DeleteUser([FromRoute] Guid id)
         {
+            await _personalInformationService.DeleteUserAsync(id);
             return Ok();
         }
     }

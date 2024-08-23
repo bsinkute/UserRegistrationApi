@@ -9,8 +9,10 @@ namespace UserRegistrationApi.Infrastructure.Repositories
         Task AddUserAsync(User user);
         Task<User> GetUserAsync(string username);
         Task<User> GetUserByIdAsync(Guid userId);
+        Task<IEnumerable<User>> GetAllUsersAsync();
         Task UpdateUserPersonalInformation(User user);
         Task UpdateUserAddress(User user);
+        Task DeleteUserAsync(Guid id);
     }
     public class UserReposotory : IUserRepository
     {
@@ -43,6 +45,16 @@ namespace UserRegistrationApi.Infrastructure.Repositories
             return user;
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            var user = await _context.Users
+                .Include(x => x.PersonalInformation)
+                .ThenInclude(x => x.Address)
+                .ToListAsync();
+
+            return user;
+        }
+
         public async Task UpdateUserPersonalInformation(User user)
         {
             _context.PersonalInformation.Update(user.PersonalInformation);
@@ -53,6 +65,16 @@ namespace UserRegistrationApi.Infrastructure.Repositories
         {
             _context.Address.Update(user.PersonalInformation.Address);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteUserAsync(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

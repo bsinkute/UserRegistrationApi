@@ -9,6 +9,7 @@ namespace UserRegistrationApi.Services
     public interface IPersonalInformationService
     {
         Task<User> GetUserAsync(Guid userId);
+        Task<IEnumerable<User>> GetUsersAsync();
         Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName);
         Task<User> UpdateUserSurnameAsync(Guid userId, string surname);
         Task<User> UpdateUserPersonalIdentificationNumberAsync(Guid userId, string personalIdentificationNumber);
@@ -19,6 +20,7 @@ namespace UserRegistrationApi.Services
         Task<User> UpdateUserStreetAsync(Guid userId, string street);
         Task<User> UpdateUserHouseNumberAsync(Guid userId, string houseNumber);
         Task<User> UpdateUserApartmentNumberAsync(Guid userId, string apartmentNumber);
+        Task<bool> DeleteUserAsync(Guid userId);
 
     }
     public class PersonalInformationService : IPersonalInformationService
@@ -42,6 +44,12 @@ namespace UserRegistrationApi.Services
                 return null;
             }
             return user;
+        }
+
+        public async Task<IEnumerable<User>> GetUsersAsync()
+        {
+            return await _userRepository.GetAllUsersAsync();
+           
         }
 
         public async Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName)
@@ -182,6 +190,12 @@ namespace UserRegistrationApi.Services
 
             await _userRepository.UpdateUserAddress(existingUser);
             return existingUser;
+        }
+
+        public async Task<bool> DeleteUserAsync(Guid userId)
+        {
+            await _userRepository.DeleteUserAsync(userId);
+            return true;
         }
     }
 }
