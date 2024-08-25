@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Net;
-using UserRegistrationApi.Domain.Models;
+﻿using UserRegistrationApi.Domain.Models;
 using UserRegistrationApi.Infrastructure.Repositories;
-using UserRegistrationApi.Models.Dto;
 
 namespace UserRegistrationApi.Services
 {
@@ -26,23 +23,15 @@ namespace UserRegistrationApi.Services
     public class PersonalInformationService : IPersonalInformationService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ICreateUserMapper _createUserMapper;
-        private readonly IUserCredentialService _userCredentialService;
 
-        public PersonalInformationService(IUserRepository userRepository, ICreateUserMapper createUserMapper, IUserCredentialService userCredentialService)
+        public PersonalInformationService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _createUserMapper = createUserMapper;
-            _userCredentialService = userCredentialService;
         }
 
         public async Task<User> GetUserAsync(Guid userId)
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
-            if (user == null)
-            {
-                return null;
-            }
             return user;
         }
 
@@ -52,7 +41,7 @@ namespace UserRegistrationApi.Services
            
         }
 
-        public async Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName)
+        private async Task<User> UpdatePersonalInformationPropertyAsync(Guid userId, Action<PersonalInformation> updateAction)
         {
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
             if (existingUser == null)
@@ -60,136 +49,74 @@ namespace UserRegistrationApi.Services
                 return null;
             }
 
-            existingUser.PersonalInformation.FirstName = firstName;
-
+            updateAction(existingUser.PersonalInformation);
             await _userRepository.UpdateUserPersonalInformation(existingUser);
+
             return existingUser;
+        }
+
+        private async Task<User> UpdateAddressPropertyAsync(Guid userId, Action<Address> updateAction)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null)
+            {
+                return null;
+            }
+
+            updateAction(existingUser.PersonalInformation.Address);
+            await _userRepository.UpdateUserAddress(existingUser);
+
+            return existingUser;
+        }
+
+        public async Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.FirstName = firstName);
         }
 
         public async Task<User> UpdateUserSurnameAsync(Guid userId, string surname)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.Surname = surname;
-
-            await _userRepository.UpdateUserPersonalInformation(existingUser);
-            return existingUser;
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Surname = surname);
         }
 
         public async Task<User> UpdateUserPersonalIdentificationNumberAsync(Guid userId, string personalIdentificationNumber)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.PersonalIdentificationNumber = personalIdentificationNumber;
-
-            await _userRepository.UpdateUserPersonalInformation(existingUser);
-            return existingUser;
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PersonalIdentificationNumber = personalIdentificationNumber);
         }
 
         public async Task<User> UpdateUserPhoneNumberAsync(Guid userId, string phoneNumber)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.PhoneNumber = phoneNumber;
-
-            await _userRepository.UpdateUserPersonalInformation(existingUser);
-            return existingUser;
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PhoneNumber = phoneNumber);
         }
 
         public async Task<User> UpdateUserEmailAsync(Guid userId, string email)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.Email = email;
-
-            await _userRepository.UpdateUserPersonalInformation(existingUser);
-            return existingUser;
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Email = email);
         }
 
         public async Task<User> UpdateUserProfilePictureAsync(Guid userId, byte[]profilePicture)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.ProfilePicture = profilePicture;
-
-            await _userRepository.UpdateUserPersonalInformation(existingUser);
-            return existingUser;
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.ProfilePicture = profilePicture);
         }
 
         public async Task<User> UpdateUserCityAsync(Guid userId, string city)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.Address.City = city;
-
-            await _userRepository.UpdateUserAddress(existingUser);
-            return existingUser;
+            return await UpdateAddressPropertyAsync(userId, address => address.City = city);
         }
 
         public async Task<User> UpdateUserStreetAsync(Guid userId, string street)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.Address.Street = street;
-
-            await _userRepository.UpdateUserAddress(existingUser);
-            return existingUser;
+            return await UpdateAddressPropertyAsync(userId, address => address.Street = street);
         }
 
         public async Task<User> UpdateUserHouseNumberAsync(Guid userId, string houseNumber)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.Address.HouseNumber = houseNumber;
-
-            await _userRepository.UpdateUserAddress(existingUser);
-            return existingUser;
+            return await UpdateAddressPropertyAsync(userId, address => address.HouseNumber = houseNumber);
         }
 
         public async Task<User> UpdateUserApartmentNumberAsync(Guid userId, string apartmentNumber)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            existingUser.PersonalInformation.Address.ApartmentNumber = apartmentNumber;
-
-            await _userRepository.UpdateUserAddress(existingUser);
-            return existingUser;
+            return await UpdateAddressPropertyAsync(userId, address => address.ApartmentNumber = apartmentNumber);
         }
 
         public async Task<bool> DeleteUserAsync(Guid userId)
