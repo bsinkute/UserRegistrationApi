@@ -1,4 +1,5 @@
 ﻿using UserRegistrationApi.Domain.Models;
+using UserRegistrationApi.Exceptions;
 using UserRegistrationApi.Infrastructure.Repositories;
 using UserRegistrationApi.Models.Dto;
 
@@ -25,6 +26,11 @@ namespace UserRegistrationApi.Services
 
         public async Task RegisterAsync(CreateUserDto userDto)
         {
+            var exsistingUser = await _userRepository.GetUserAsync(userDto.Username);
+            if (exsistingUser != null)
+            {
+                throw new UsernameAlreadyExistsException();
+            }
             var user = _createUserMapper.Bind(userDto);
             
             await _userRepository.AddUserAsync(user);

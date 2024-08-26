@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using UserRegistrationApi.Exceptions;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
@@ -27,7 +28,15 @@ namespace UserRegistrationApi.Controllers
             {
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
-            await _userService.RegisterAsync(userDto);
+
+            try
+            {
+                await _userService.RegisterAsync(userDto);
+            }
+            catch (UsernameAlreadyExistsException)
+            {
+                return BadRequest($"{userDto.Username} already exists");
+            }
 
             return Ok();
         }
