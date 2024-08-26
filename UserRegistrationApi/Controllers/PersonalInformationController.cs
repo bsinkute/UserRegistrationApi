@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UserRegistrationApi.Attributes;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
@@ -15,12 +14,14 @@ namespace UserRegistrationApi.Controllers
         private readonly IPersonalInformationService _personalInformationService;
         private readonly IProfilePictureService _profilePictureService;
         private readonly IUserDtoMapper _userDtoMapper;
+        private readonly IUserValidator _userValidator;
 
-        public PersonalInformationController(IPersonalInformationService personalInformationService, IProfilePictureService profilePictureService, IUserDtoMapper userDtoMapper)
+        public PersonalInformationController(IPersonalInformationService personalInformationService, IProfilePictureService profilePictureService, IUserDtoMapper userDtoMapper, IUserValidator userValidator)
         {
             _personalInformationService = personalInformationService;
             _profilePictureService = profilePictureService;
             _userDtoMapper = userDtoMapper;
+            _userValidator = userValidator;
         }
 
         [HttpGet("{userId:Guid}")]
@@ -43,9 +44,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateFirstNameAsync([FromRoute] Guid userId, [FromBody] string firstName)
         {
-            if (string.IsNullOrWhiteSpace(firstName))
+            var validationResult = _userValidator.ValidateFirstName(firstName);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserFirstNameAsync(userId, firstName);
@@ -65,9 +67,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateSurnameAsync([FromRoute] Guid userId, [FromBody] string surname)
         {
-            if (string.IsNullOrWhiteSpace(surname))
+            var validationResult = _userValidator.ValidateSurname(surname);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserSurnameAsync(userId, surname);
@@ -87,9 +90,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateIdentificationNumberAsync([FromRoute] Guid userId, [FromBody] string personalIdentificationNumber)
         {
-            if (string.IsNullOrWhiteSpace(personalIdentificationNumber))
+            var validationResult = _userValidator.ValidatePersonalIdentificationNumber(personalIdentificationNumber);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserPersonalIdentificationNumberAsync(userId, personalIdentificationNumber);
@@ -109,9 +113,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdatePhoneNumberAsync([FromRoute] Guid userId, [FromBody] string phoneNumber)
         {
-            if (string.IsNullOrWhiteSpace(phoneNumber))
+            var validationResult = _userValidator.ValidatePhoneNumber(phoneNumber);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserPhoneNumberAsync(userId, phoneNumber);
@@ -131,9 +136,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateEmailAsync([FromRoute] Guid userId, [FromBody] string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
+            var validationResult = _userValidator.ValidateEmail(email);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserEmailAsync(userId, email);
@@ -153,9 +159,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateProfilePictureAsync([FromRoute] Guid userId, [FromForm] UpdateProfilePictureDto updateProfilePictureDto)
         {
-            if (updateProfilePictureDto is null)
+            var validationResult = _userValidator.ValidateProfilePicture(updateProfilePictureDto?.Image);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var scaledPicture = _profilePictureService.GenerateProfilePicture(updateProfilePictureDto.Image);
@@ -177,9 +184,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateCityAsync([FromRoute] Guid userId, [FromBody] string city)
         {
-            if (string.IsNullOrWhiteSpace(city))
+            var validationResult = _userValidator.ValidateCity(city);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserCityAsync(userId, city);
@@ -199,9 +207,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateStreetAsync([FromRoute] Guid userId, [FromBody] string street)
         {
-            if (string.IsNullOrWhiteSpace(street))
+            var validationResult = _userValidator.ValidateStreet(street);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserStreetAsync(userId, street);
@@ -221,9 +230,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateHouseNumberAsync([FromRoute] Guid userId, [FromBody] string houseNumber)
         {
-            if (string.IsNullOrWhiteSpace(houseNumber))
+            var validationResult = _userValidator.ValidateHouseNumber(houseNumber);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserHouseNumberAsync(userId, houseNumber);
@@ -235,6 +245,7 @@ namespace UserRegistrationApi.Controllers
 
             return Ok();
         }
+
         [HttpPut("{userId:Guid}/apartmentNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -242,9 +253,10 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateApartmentNumberAsync([FromRoute] Guid userId, [FromBody] string apartmentNumber)
         {
-            if (string.IsNullOrWhiteSpace(apartmentNumber))
+            var validationResult = _userValidator.ValidateHouseNumber(apartmentNumber);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User data or first name cannot be null or empty.");
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
             var updatedUser = await _personalInformationService.UpdateUserApartmentNumberAsync(userId, apartmentNumber);
@@ -256,7 +268,5 @@ namespace UserRegistrationApi.Controllers
 
             return Ok();
         }
-
-
     }
 }
