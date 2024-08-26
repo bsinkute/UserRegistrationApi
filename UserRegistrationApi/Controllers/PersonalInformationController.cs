@@ -24,26 +24,40 @@ namespace UserRegistrationApi.Controllers
             _userValidator = userValidator;
         }
 
-        [HttpGet("{userId:Guid}")]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetUserByIdAsync([FromRoute] Guid userId)
+        public async Task<ActionResult> GetUserByIdAsync()
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null) 
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var user = await _personalInformationService.GetUserAsync(userId);
             if (user == null) return NotFound(userId);
 
             return Ok(_userDtoMapper.Bind(user));
         }
 
-        [HttpPut("{userId:Guid}/firstName")]
+        [HttpPut("firstName")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateFirstNameAsync([FromRoute] Guid userId, [FromBody] string firstName)
+        public async Task<ActionResult> UpdateFirstNameAsync([FromBody] string firstName)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateFirstName(firstName);
             if (!validationResult.IsValid)
             {
@@ -60,13 +74,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/surname")]
+        [HttpPut("surname")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateSurnameAsync([FromRoute] Guid userId, [FromBody] string surname)
+        public async Task<ActionResult> UpdateSurnameAsync([FromBody] string surname)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateSurname(surname);
             if (!validationResult.IsValid)
             {
@@ -83,13 +104,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/personalIdentificationNumber")]
+        [HttpPut("personalIdentificationNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateIdentificationNumberAsync([FromRoute] Guid userId, [FromBody] string personalIdentificationNumber)
+        public async Task<ActionResult> UpdateIdentificationNumberAsync([FromBody] string personalIdentificationNumber)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidatePersonalIdentificationNumber(personalIdentificationNumber);
             if (!validationResult.IsValid)
             {
@@ -106,13 +134,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/phoneNumber")]
+        [HttpPut("phoneNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdatePhoneNumberAsync([FromRoute] Guid userId, [FromBody] string phoneNumber)
+        public async Task<ActionResult> UpdatePhoneNumberAsync([FromBody] string phoneNumber)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidatePhoneNumber(phoneNumber);
             if (!validationResult.IsValid)
             {
@@ -129,13 +164,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/email")]
+        [HttpPut("email")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateEmailAsync([FromRoute] Guid userId, [FromBody] string email)
+        public async Task<ActionResult> UpdateEmailAsync([FromBody] string email)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateEmail(email);
             if (!validationResult.IsValid)
             {
@@ -152,13 +194,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/profilePicture")]
+        [HttpPut("profilePicture")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateProfilePictureAsync([FromRoute] Guid userId, [FromForm] UpdateProfilePictureDto updateProfilePictureDto)
+        public async Task<ActionResult> UpdateProfilePictureAsync([FromForm] UpdateProfilePictureDto updateProfilePictureDto)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateProfilePicture(updateProfilePictureDto?.Image);
             if (!validationResult.IsValid)
             {
@@ -177,13 +226,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/city")]
+        [HttpPut("city")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateCityAsync([FromRoute] Guid userId, [FromBody] string city)
+        public async Task<ActionResult> UpdateCityAsync([FromBody] string city)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateCity(city);
             if (!validationResult.IsValid)
             {
@@ -200,13 +256,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/street")]
+        [HttpPut("street")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateStreetAsync([FromRoute] Guid userId, [FromBody] string street)
+        public async Task<ActionResult> UpdateStreetAsync([FromBody] string street)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateStreet(street);
             if (!validationResult.IsValid)
             {
@@ -223,13 +286,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/houseNumber")]
+        [HttpPut("houseNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateHouseNumberAsync([FromRoute] Guid userId, [FromBody] string houseNumber)
+        public async Task<ActionResult> UpdateHouseNumberAsync([FromBody] string houseNumber)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateHouseNumber(houseNumber);
             if (!validationResult.IsValid)
             {
@@ -246,13 +316,20 @@ namespace UserRegistrationApi.Controllers
             return Ok();
         }
 
-        [HttpPut("{userId:Guid}/apartmentNumber")]
+        [HttpPut("apartmentNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateApartmentNumberAsync([FromRoute] Guid userId, [FromBody] string apartmentNumber)
+        public async Task<ActionResult> UpdateApartmentNumberAsync([FromBody] string apartmentNumber)
         {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
             var validationResult = _userValidator.ValidateHouseNumber(apartmentNumber);
             if (!validationResult.IsValid)
             {

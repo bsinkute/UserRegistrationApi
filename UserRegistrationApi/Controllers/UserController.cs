@@ -47,10 +47,10 @@ namespace UserRegistrationApi.Controllers
             var user = await _userService.LoginAsync(username, password);
             if (user == null) 
             { 
-                return Unauthorized();
+                return BadRequest("Incorrect username or password");
             }
 
-            var token = _jwtService.GenerateToken(username, user.Role);
+            var token = _jwtService.GenerateToken(username, user.UserId, user.Role);
             return Ok(token);
         }
     }

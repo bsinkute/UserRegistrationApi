@@ -7,7 +7,7 @@ namespace UserRegistrationApi.Services
 {
     public interface IJwtService
     {
-        string GenerateToken(string username, string role);
+        string GenerateToken(string username, Guid userId, string role);
     }
 
     public class JwtService : IJwtService
@@ -19,7 +19,7 @@ namespace UserRegistrationApi.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(string username, string role)
+        public string GenerateToken(string username, Guid userId, string role)
         {
             var key = _configuration["Jwt:Key"];
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
@@ -28,6 +28,7 @@ namespace UserRegistrationApi.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, username),
+                new Claim("userId", userId.ToString()),
                 new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
