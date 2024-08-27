@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UserRegistrationApi.Domain.Models;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
@@ -13,12 +12,10 @@ namespace UserRegistrationApi.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IPersonalInformationService _personalInformationService;
         private readonly IUserDtoMapper _userDtoMapper;
-        public AdminController(IUserService userService, IPersonalInformationService personalInformationService, IUserDtoMapper userDtoMapper)
+        public AdminController(IUserService userService, IUserDtoMapper userDtoMapper)
         {
             _userService = userService;
-            _personalInformationService = personalInformationService;
             _userDtoMapper = userDtoMapper;
         }
 
@@ -30,7 +27,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersAsync()
         {
-            var users = await _personalInformationService.GetUsersAsync();
+            var users = await _userService.GetUsersAsync();
 
             if (users == null || !users.Any())
             {
@@ -50,7 +47,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteUser([FromRoute] Guid id)
         {
-            await _personalInformationService.DeleteUserAsync(id);
+            await _userService.DeleteUserAsync(id);
             return Ok();
         }
     }

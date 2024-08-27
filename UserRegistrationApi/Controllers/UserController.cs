@@ -9,13 +9,13 @@ namespace UserRegistrationApi.Controllers
     public class UserController : ControllerBase
     {
 
-        private readonly IUserService _userService;
+        private readonly IAuthenticationService _authenticationService;
         private readonly IJwtService _jwtService;
         private readonly IUserValidator _userValidator;
 
-        public UserController(IUserService userService, IJwtService jwtService, IUserValidator userValidator)
+        public UserController(IAuthenticationService authenticationService, IJwtService jwtService, IUserValidator userValidator)
         {
-            _userService = userService;
+            _authenticationService = authenticationService;
             _jwtService = jwtService;
             _userValidator = userValidator;
         }
@@ -34,7 +34,7 @@ namespace UserRegistrationApi.Controllers
 
             try
             {
-                await _userService.RegisterAsync(userDto);
+                await _authenticationService.RegisterAsync(userDto);
             }
             catch (UsernameAlreadyExistsException)
             {
@@ -50,7 +50,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Login([FromHeader(Name = "username")] string username, [FromHeader(Name = "password")] string password)
         {
-            var user = await _userService.LoginAsync(username, password);
+            var user = await _authenticationService.LoginAsync(username, password);
             if (user == null) 
             { 
                 return BadRequest("Incorrect username or password");

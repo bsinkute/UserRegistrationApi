@@ -1,56 +1,129 @@
 ﻿using UserRegistrationApi.Domain.Models;
-using UserRegistrationApi.Exceptions;
 using UserRegistrationApi.Infrastructure.Repositories;
-using UserRegistrationApi.Models.Dto;
 
 namespace UserRegistrationApi.Services
 {
     public interface IUserService
     {
-        Task RegisterAsync(CreateUserDto userDto);
-        Task<User?> LoginAsync(string username, string password);
+        Task<User> GetUserAsync(Guid userId);
+        Task<IEnumerable<User>> GetUsersAsync();
+        Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName);
+        Task<User> UpdateUserSurnameAsync(Guid userId, string surname);
+        Task<User> UpdateUserPersonalIdentificationNumberAsync(Guid userId, string personalIdentificationNumber);
+        Task<User> UpdateUserPhoneNumberAsync(Guid userId, string phoneNumber);
+        Task<User> UpdateUserEmailAsync(Guid userId, string email);
+        Task<User> UpdateUserProfilePictureAsync(Guid userId, byte[] profilePicture);
+        Task<User> UpdateUserCityAsync(Guid userId, string city);
+        Task<User> UpdateUserStreetAsync(Guid userId, string street);
+        Task<User> UpdateUserHouseNumberAsync(Guid userId, string houseNumber);
+        Task<User> UpdateUserApartmentNumberAsync(Guid userId, string apartmentNumber);
+        Task<bool> DeleteUserAsync(Guid userId);
+
     }
 
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ICreateUserMapper _createUserMapper;
-        private readonly IUserCredentialService _userCredentialService;
 
-        public UserService(IUserRepository userRepository, ICreateUserMapper createUserMapper, IUserCredentialService userCredentialService)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _createUserMapper = createUserMapper;
-            _userCredentialService = userCredentialService;
         }
 
-        public async Task RegisterAsync(CreateUserDto userDto)
+        public async Task<User> GetUserAsync(Guid userId)
         {
-            var exsistingUser = await _userRepository.GetUserAsync(userDto.Username);
-            if (exsistingUser != null)
-            {
-                throw new UsernameAlreadyExistsException();
-            }
-            var user = _createUserMapper.Bind(userDto);
-            
-            await _userRepository.AddUserAsync(user);
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            return user;
         }
 
-        public async Task<User?> LoginAsync(string username, string password)
+        public async Task<IEnumerable<User>> GetUsersAsync()
         {
-            var user = await _userRepository.GetUserAsync(username);
+            return await _userRepository.GetAllUsersAsync();
+           
+        }
 
-            if (user == null)
+        private async Task<User> UpdatePersonalInformationPropertyAsync(Guid userId, Action<PersonalInformation> updateAction)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null)
             {
                 return null;
             }
 
-            if (_userCredentialService.VerifyPasswordHash(password, user.Password, user.Salt))
+            updateAction(existingUser.PersonalInformation);
+            await _userRepository.UpdateUserPersonalInformation(existingUser);
+
+            return existingUser;
+        }
+
+        private async Task<User> UpdateAddressPropertyAsync(Guid userId, Action<Address> updateAction)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null)
             {
-                return user;
+                return null;
             }
 
-            return null;
+            updateAction(existingUser.PersonalInformation.Address);
+            await _userRepository.UpdateUserAddress(existingUser);
+
+            return existingUser;
+        }
+
+        public async Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.FirstName = firstName);
+        }
+
+        public async Task<User> UpdateUserSurnameAsync(Guid userId, string surname)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Surname = surname);
+        }
+
+        public async Task<User> UpdateUserPersonalIdentificationNumberAsync(Guid userId, string personalIdentificationNumber)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PersonalIdentificationNumber = personalIdentificationNumber);
+        }
+
+        public async Task<User> UpdateUserPhoneNumberAsync(Guid userId, string phoneNumber)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PhoneNumber = phoneNumber);
+        }
+
+        public async Task<User> UpdateUserEmailAsync(Guid userId, string email)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Email = email);
+        }
+
+        public async Task<User> UpdateUserProfilePictureAsync(Guid userId, byte[]profilePicture)
+        {
+            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.ProfilePicture = profilePicture);
+        }
+
+        public async Task<User> UpdateUserCityAsync(Guid userId, string city)
+        {
+            return await UpdateAddressPropertyAsync(userId, address => address.City = city);
+        }
+
+        public async Task<User> UpdateUserStreetAsync(Guid userId, string street)
+        {
+            return await UpdateAddressPropertyAsync(userId, address => address.Street = street);
+        }
+
+        public async Task<User> UpdateUserHouseNumberAsync(Guid userId, string houseNumber)
+        {
+            return await UpdateAddressPropertyAsync(userId, address => address.HouseNumber = houseNumber);
+        }
+
+        public async Task<User> UpdateUserApartmentNumberAsync(Guid userId, string apartmentNumber)
+        {
+            return await UpdateAddressPropertyAsync(userId, address => address.ApartmentNumber = apartmentNumber);
+        }
+
+        public async Task<bool> DeleteUserAsync(Guid userId)
+        {
+            await _userRepository.DeleteUserAsync(userId);
+            return true;
         }
     }
 }

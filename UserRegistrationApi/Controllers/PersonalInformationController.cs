@@ -11,14 +11,14 @@ namespace UserRegistrationApi.Controllers
     [Authorize]
     public class PersonalInformationController : ControllerBase
     {
-        private readonly IPersonalInformationService _personalInformationService;
+        private readonly IUserService _userService;
         private readonly IProfilePictureService _profilePictureService;
         private readonly IUserDtoMapper _userDtoMapper;
         private readonly IUserValidator _userValidator;
 
-        public PersonalInformationController(IPersonalInformationService personalInformationService, IProfilePictureService profilePictureService, IUserDtoMapper userDtoMapper, IUserValidator userValidator)
+        public PersonalInformationController(IUserService userService, IProfilePictureService profilePictureService, IUserDtoMapper userDtoMapper, IUserValidator userValidator)
         {
-            _personalInformationService = personalInformationService;
+            _userService = userService;
             _profilePictureService = profilePictureService;
             _userDtoMapper = userDtoMapper;
             _userValidator = userValidator;
@@ -39,7 +39,7 @@ namespace UserRegistrationApi.Controllers
             }
             var userId = new Guid(userIdString);
 
-            var user = await _personalInformationService.GetUserAsync(userId);
+            var user = await _userService.GetUserAsync(userId);
             if (user == null) return NotFound(userId);
 
             return Ok(_userDtoMapper.Bind(user));
@@ -66,7 +66,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserFirstNameAsync(userId, firstName);
+            var updatedUser = await _userService.UpdateUserFirstNameAsync(userId, firstName);
 
             if (updatedUser == null)
             {
@@ -97,7 +97,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserSurnameAsync(userId, surname);
+            var updatedUser = await _userService.UpdateUserSurnameAsync(userId, surname);
 
             if (updatedUser == null)
             {
@@ -128,7 +128,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserPersonalIdentificationNumberAsync(userId, personalIdentificationNumber);
+            var updatedUser = await _userService.UpdateUserPersonalIdentificationNumberAsync(userId, personalIdentificationNumber);
 
             if (updatedUser == null)
             {
@@ -159,7 +159,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserPhoneNumberAsync(userId, phoneNumber);
+            var updatedUser = await _userService.UpdateUserPhoneNumberAsync(userId, phoneNumber);
 
             if (updatedUser == null)
             {
@@ -190,7 +190,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserEmailAsync(userId, email);
+            var updatedUser = await _userService.UpdateUserEmailAsync(userId, email);
 
             if (updatedUser == null)
             {
@@ -223,7 +223,7 @@ namespace UserRegistrationApi.Controllers
 
             var scaledPicture = _profilePictureService.GenerateProfilePicture(updateProfilePictureDto.Image);
 
-            var updatedUser = await _personalInformationService.UpdateUserProfilePictureAsync(userId, scaledPicture);
+            var updatedUser = await _userService.UpdateUserProfilePictureAsync(userId, scaledPicture);
 
             if (updatedUser == null)
             {
@@ -254,7 +254,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserCityAsync(userId, city);
+            var updatedUser = await _userService.UpdateUserCityAsync(userId, city);
 
             if (updatedUser == null)
             {
@@ -285,7 +285,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserStreetAsync(userId, street);
+            var updatedUser = await _userService.UpdateUserStreetAsync(userId, street);
 
             if (updatedUser == null)
             {
@@ -316,7 +316,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserHouseNumberAsync(userId, houseNumber);
+            var updatedUser = await _userService.UpdateUserHouseNumberAsync(userId, houseNumber);
 
             if (updatedUser == null)
             {
@@ -347,7 +347,7 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var updatedUser = await _personalInformationService.UpdateUserApartmentNumberAsync(userId, apartmentNumber);
+            var updatedUser = await _userService.UpdateUserApartmentNumberAsync(userId, apartmentNumber);
 
             if (updatedUser == null)
             {

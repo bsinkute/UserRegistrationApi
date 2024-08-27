@@ -72,9 +72,9 @@ namespace UserRegistrationApi
             builder.Services.AddScoped<IUserCredentialService, UserCredentialService>();
             builder.Services.AddScoped<IProfilePictureService, ProfilePictureService>();
             builder.Services.AddScoped<ICreateUserMapper, CreateUserMapper>();
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<IJwtService, JwtService>();
-            builder.Services.AddScoped<IPersonalInformationService, PersonalInformationService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IUserDtoMapper, UserDtoMapper>();
             builder.Services.AddScoped<IUserValidator, UserValidator>();
 
