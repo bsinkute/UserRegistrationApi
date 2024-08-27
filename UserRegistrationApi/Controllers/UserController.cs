@@ -1,62 +1,360 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
 namespace UserRegistrationApi.Controllers
 {
+
     [ApiController]
+    [Route("api/users")]
+    [Authorize]
     public class UserController : ControllerBase
     {
-
-        private readonly IAuthenticationService _authenticationService;
-        private readonly IJwtService _jwtService;
-        private readonly IUserValidator _userValidator;
         private readonly IUserService _userService;
+        private readonly IProfilePictureService _profilePictureService;
+        private readonly IUserDtoMapper _userDtoMapper;
+        private readonly IUserValidator _userValidator;
 
-        public UserController(IAuthenticationService authenticationService, IJwtService jwtService, IUserValidator userValidator, IUserService userService)
+        public UserController(IUserService userService, IProfilePictureService profilePictureService, IUserDtoMapper userDtoMapper, IUserValidator userValidator)
         {
-            _authenticationService = authenticationService;
-            _jwtService = jwtService;
-            _userValidator = userValidator;
             _userService = userService;
+            _profilePictureService = profilePictureService;
+            _userDtoMapper = userDtoMapper;
+            _userValidator = userValidator;
         }
 
-        [HttpPost("Register")]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Register([FromForm] CreateUserDto userDto)
+        public async Task<ActionResult> GetUserByIdAsync()
         {
-            var validationResult = _userValidator.ValidateCreateUserDto(userDto);
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null) 
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var user = await _userService.GetUserAsync(userId);
+            if (user == null) return NotFound(userId);
+
+            return Ok(_userDtoMapper.Bind(user));
+        }
+
+        [HttpPut("firstName")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateFirstNameAsync([FromBody] string firstName)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateFirstName(firstName);
             if (!validationResult.IsValid)
             {
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            if (await _userService.GetUserAsync(userDto.Username) != null)
-            {
-                return BadRequest($"{userDto.Username} already exists");
-            }
+            var updatedUser = await _userService.UpdateUserFirstNameAsync(userId, firstName);
 
-            await _authenticationService.RegisterAsync(userDto);
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
 
             return Ok();
         }
 
-        [HttpGet("Login")]
+        [HttpPut("surname")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Login([FromHeader(Name = "username")] string username, [FromHeader(Name = "password")] string password)
+        public async Task<ActionResult> UpdateSurnameAsync([FromBody] string surname)
         {
-            var user = await _authenticationService.LoginAsync(username, password);
-            if (user == null) 
-            { 
-                return BadRequest("Incorrect username or password");
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateSurname(surname);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            var token = _jwtService.GenerateToken(username, user.UserId, user.Role);
-            return Ok(token);
+            var updatedUser = await _userService.UpdateUserSurnameAsync(userId, surname);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("personalIdentificationNumber")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateIdentificationNumberAsync([FromBody] string personalIdentificationNumber)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidatePersonalIdentificationNumber(personalIdentificationNumber);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserPersonalIdentificationNumberAsync(userId, personalIdentificationNumber);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("phoneNumber")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdatePhoneNumberAsync([FromBody] string phoneNumber)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidatePhoneNumber(phoneNumber);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserPhoneNumberAsync(userId, phoneNumber);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("email")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateEmailAsync([FromBody] string email)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateEmail(email);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserEmailAsync(userId, email);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("profilePicture")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateProfilePictureAsync([FromForm] UpdateProfilePictureDto updateProfilePictureDto)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateProfilePicture(updateProfilePictureDto?.Image);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var scaledPicture = _profilePictureService.GenerateProfilePicture(updateProfilePictureDto.Image);
+
+            var updatedUser = await _userService.UpdateUserProfilePictureAsync(userId, scaledPicture);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("city")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateCityAsync([FromBody] string city)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateCity(city);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserCityAsync(userId, city);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("street")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateStreetAsync([FromBody] string street)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateStreet(street);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserStreetAsync(userId, street);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("houseNumber")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateHouseNumberAsync([FromBody] string houseNumber)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateHouseNumber(houseNumber);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserHouseNumberAsync(userId, houseNumber);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("apartmentNumber")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateApartmentNumberAsync([FromBody] string apartmentNumber)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+            var userId = new Guid(userIdString);
+
+            var validationResult = _userValidator.ValidateHouseNumber(apartmentNumber);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(string.Join("\r\n", validationResult.Errors));
+            }
+
+            var updatedUser = await _userService.UpdateUserApartmentNumberAsync(userId, apartmentNumber);
+
+            if (updatedUser == null)
+            {
+                return NotFound($"User with ID {userId} not found.");
+            }
+
+            return Ok();
         }
     }
 }
