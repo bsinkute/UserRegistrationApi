@@ -21,6 +21,9 @@ namespace UserRegistrationApi.Controllers
         }
 
         [HttpPost("Register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Register([FromForm] CreateUserDto userDto)
         {
             var validationResult = _userValidator.ValidateCreateUserDto(userDto);
@@ -42,6 +45,9 @@ namespace UserRegistrationApi.Controllers
         }
 
         [HttpGet("Login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Login([FromHeader(Name = "username")] string username, [FromHeader(Name = "password")] string password)
         {
             var user = await _userService.LoginAsync(username, password);
