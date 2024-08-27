@@ -24,6 +24,7 @@ namespace UserRegistrationApi.Services
         {
             var validationResult = new ValidationResult();
 
+            validationResult.Merge(ValidatePassword(createUserDto.Password));
             validationResult.Merge(ValidateFirstName(createUserDto.FirstName));
             validationResult.Merge(ValidateSurname(createUserDto.Surname));
             validationResult.Merge(ValidatePersonalIdentificationNumber(createUserDto.PersonalIdentificationNumber));
@@ -37,7 +38,21 @@ namespace UserRegistrationApi.Services
 
             return validationResult;
         }
-
+        public ValidationResult ValidatePassword(string password)
+        {
+            var validationResult = new ValidationResult();
+            const int passwordLength = 500;
+            if (!ValidateStringValue(password, passwordLength))
+            {
+                validationResult.Errors.Add($"Passworrd cannot be null, empty or longer than {passwordLength}");
+            }
+            string pattern = @"^(?=.*\d)(?=.*[A-Z])(?=.*[!@#$%^&*(),.?""':{}|<>]).{6,}$";
+            if (!Regex.IsMatch(password, pattern))
+            {
+                validationResult.Errors.Add($"Password must have a number, uppercase letter, special character (e.g., !@#$%^&*()) and have at least 6 characters long");
+            }
+            return validationResult;
+        }
         public ValidationResult ValidateFirstName(string firstName)
         {
             var validationResult = new ValidationResult();

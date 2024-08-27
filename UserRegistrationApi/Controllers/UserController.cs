@@ -42,7 +42,7 @@ namespace UserRegistrationApi.Controllers
         }
 
         [HttpGet("Login")]
-        public async Task<ActionResult> Login(string username, string password)
+        public async Task<ActionResult> Login([FromHeader(Name = "username")] string username, [FromHeader(Name = "password")] string password)
         {
             var user = await _userService.LoginAsync(username, password);
             if (user == null) 
