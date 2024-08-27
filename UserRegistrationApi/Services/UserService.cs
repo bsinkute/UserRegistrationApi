@@ -6,6 +6,7 @@ namespace UserRegistrationApi.Services
     public interface IUserService
     {
         Task<User> GetUserAsync(Guid userId);
+        Task<User> GetUserAsync(string username);
         Task<IEnumerable<User>> GetUsersAsync();
         Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName);
         Task<User> UpdateUserSurnameAsync(Guid userId, string surname);
@@ -34,6 +35,11 @@ namespace UserRegistrationApi.Services
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
             return user;
+        }
+
+        public async Task<User> GetUserAsync(string username)
+        {
+            return await _userRepository.GetUserAsync(username);
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync()

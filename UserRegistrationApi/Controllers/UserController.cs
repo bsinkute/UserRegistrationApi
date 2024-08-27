@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UserRegistrationApi.Exceptions;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
@@ -12,12 +11,14 @@ namespace UserRegistrationApi.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly IJwtService _jwtService;
         private readonly IUserValidator _userValidator;
+        private readonly IUserService _userService;
 
-        public UserController(IAuthenticationService authenticationService, IJwtService jwtService, IUserValidator userValidator)
+        public UserController(IAuthenticationService authenticationService, IJwtService jwtService, IUserValidator userValidator, IUserService userService)
         {
             _authenticationService = authenticationService;
             _jwtService = jwtService;
             _userValidator = userValidator;
+            _userService = userService;
         }
 
         [HttpPost("Register")]
@@ -32,14 +33,12 @@ namespace UserRegistrationApi.Controllers
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
             }
 
-            try
-            {
-                await _authenticationService.RegisterAsync(userDto);
-            }
-            catch (UsernameAlreadyExistsException)
+            if (await _userService.GetUserAsync(userDto.Username) != null)
             {
                 return BadRequest($"{userDto.Username} already exists");
             }
+
+            await _authenticationService.RegisterAsync(userDto);
 
             return Ok();
         }
