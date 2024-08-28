@@ -76,54 +76,54 @@ namespace UserRegistrationApi.Services
             return existingUser;
         }
 
-        public async Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName)
+        public Task<User> UpdateUserFirstNameAsync(Guid userId, string firstName)
         {
-            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.FirstName = firstName);
+            return UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.FirstName = firstName);
         }
 
-        public async Task<User> UpdateUserSurnameAsync(Guid userId, string surname)
+        public Task<User> UpdateUserSurnameAsync(Guid userId, string surname)
         {
-            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Surname = surname);
+            return UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Surname = surname);
         }
 
-        public async Task<User> UpdateUserPersonalIdentificationNumberAsync(Guid userId, string personalIdentificationNumber)
+        public Task<User> UpdateUserPersonalIdentificationNumberAsync(Guid userId, string personalIdentificationNumber)
         {
-            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PersonalIdentificationNumber = personalIdentificationNumber);
+            return UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PersonalIdentificationNumber = personalIdentificationNumber);
         }
 
-        public async Task<User> UpdateUserPhoneNumberAsync(Guid userId, string phoneNumber)
+        public Task<User> UpdateUserPhoneNumberAsync(Guid userId, string phoneNumber)
         {
-            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PhoneNumber = phoneNumber);
+            return UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.PhoneNumber = phoneNumber);
         }
 
-        public async Task<User> UpdateUserEmailAsync(Guid userId, string email)
+        public Task<User> UpdateUserEmailAsync(Guid userId, string email)
         {
-            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Email = email);
+            return UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.Email = email);
         }
 
-        public async Task<User> UpdateUserProfilePictureAsync(Guid userId, byte[]profilePicture)
+        public Task<User> UpdateUserProfilePictureAsync(Guid userId, byte[]profilePicture)
         {
-            return await UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.ProfilePicture = profilePicture);
+            return UpdatePersonalInformationPropertyAsync(userId, personalInformation => personalInformation.ProfilePicture = profilePicture);
         }
 
-        public async Task<User> UpdateUserCityAsync(Guid userId, string city)
+        public Task<User> UpdateUserCityAsync(Guid userId, string city)
         {
-            return await UpdateAddressPropertyAsync(userId, address => address.City = city);
+            return UpdateAddressPropertyAsync(userId, address => address.City = city);
         }
 
-        public async Task<User> UpdateUserStreetAsync(Guid userId, string street)
+        public Task<User> UpdateUserStreetAsync(Guid userId, string street)
         {
-            return await UpdateAddressPropertyAsync(userId, address => address.Street = street);
+            return UpdateAddressPropertyAsync(userId, address => address.Street = street);
         }
 
-        public async Task<User> UpdateUserHouseNumberAsync(Guid userId, string houseNumber)
+        public Task<User> UpdateUserHouseNumberAsync(Guid userId, string houseNumber)
         {
-            return await UpdateAddressPropertyAsync(userId, address => address.HouseNumber = houseNumber);
+            return UpdateAddressPropertyAsync(userId, address => address.HouseNumber = houseNumber);
         }
 
-        public async Task<User> UpdateUserApartmentNumberAsync(Guid userId, string apartmentNumber)
+        public Task<User> UpdateUserApartmentNumberAsync(Guid userId, string apartmentNumber)
         {
-            return await UpdateAddressPropertyAsync(userId, address => address.ApartmentNumber = apartmentNumber);
+            return UpdateAddressPropertyAsync(userId, address => address.ApartmentNumber = apartmentNumber);
         }
 
         public async Task<bool> DeleteUserAsync(Guid userId)

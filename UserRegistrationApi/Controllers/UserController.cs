@@ -32,8 +32,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetUserByIdAsync()
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null) 
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -53,8 +52,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateFirstNameAsync([FromBody] string firstName)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -84,8 +82,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateSurnameAsync([FromBody] string surname)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -115,8 +112,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateIdentificationNumberAsync([FromBody] string personalIdentificationNumber)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -146,8 +142,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdatePhoneNumberAsync([FromBody] string phoneNumber)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -177,8 +172,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateEmailAsync([FromBody] string email)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -208,8 +202,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateProfilePictureAsync([FromForm] UpdateProfilePictureDto updateProfilePictureDto)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -241,8 +234,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateCityAsync([FromBody] string city)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -272,8 +264,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateStreetAsync([FromBody] string street)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -303,8 +294,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateHouseNumberAsync([FromBody] string houseNumber)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -334,8 +324,7 @@ namespace UserRegistrationApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateApartmentNumberAsync([FromBody] string apartmentNumber)
         {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userIdString == null)
+            if (!TryGetJwtClaim("userId", out var userIdString))
             {
                 return Unauthorized();
             }
@@ -355,6 +344,12 @@ namespace UserRegistrationApi.Controllers
             }
 
             return Ok();
+        }
+
+        private bool TryGetJwtClaim(string claim, out string? claimValue)
+        {
+            claimValue = User.Claims.FirstOrDefault(c => c.Type == claim)?.Value;
+            return claimValue != null;
         }
     }
 }
