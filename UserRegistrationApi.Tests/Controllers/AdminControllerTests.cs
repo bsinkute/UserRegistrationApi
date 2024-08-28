@@ -5,7 +5,7 @@ using UserRegistrationApi.Domain.Models;
 using UserRegistrationApi.Models.Dto;
 using UserRegistrationApi.Services;
 
-namespace UserRegistrationApi.Tests
+namespace UserRegistrationApi.Tests.Controllers
 {
     public class AdminControllerTests
     {

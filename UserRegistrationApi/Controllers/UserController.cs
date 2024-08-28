@@ -330,7 +330,7 @@ namespace UserRegistrationApi.Controllers
             }
             var userId = new Guid(userIdString);
 
-            var validationResult = _userValidator.ValidateHouseNumber(apartmentNumber);
+            var validationResult = _userValidator.ValidateApartmentNumber(apartmentNumber);
             if (!validationResult.IsValid)
             {
                 return BadRequest(string.Join("\r\n", validationResult.Errors));
