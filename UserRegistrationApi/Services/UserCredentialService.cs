@@ -14,11 +14,11 @@ namespace UserRegistrationApi.Services
     {
         public HashedCredentials GetHashedCredentials(string password)
         {
-            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+            using var hmac = new HMACSHA512();
             return new HashedCredentials
             {
-                Password = passwordHash,
-                Salt = passwordSalt
+                Password = hmac.Key,
+                Salt = hmac.ComputeHash(Encoding.UTF8.GetBytes(password))
             };
         }
 
@@ -27,14 +27,6 @@ namespace UserRegistrationApi.Services
             using var hmac = new HMACSHA512(salt);
             var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             return hash.SequenceEqual(passwordHash);
-
-        }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using var hmac = new HMACSHA512();
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
     }
 }
